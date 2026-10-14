@@ -1,0 +1,172 @@
+<% layout("/layouts/boilerplate") -%> 
+
+<!-- Category Filter Bar & Tax Switcher -->
+<div class="filters-container">
+  <div class="filters-scroll-wrapper" id="filtersScrollWrapper">
+    <div id="filters">
+      <div class="filter active" data-category="All">
+        <div class="filter-icon"><i class="fa-solid fa-earth-americas"></i></div>  
+        <p>All Havens</p>
+      </div>
+      <div class="filter" data-category="Trending">
+        <div class="filter-icon"><i class="fa-solid fa-fire"></i></div>  
+        <p>Trending</p>
+      </div>
+      <div class="filter" data-category="Beachfront">
+        <div class="filter-icon"><i class="fa-solid fa-umbrella-beach"></i></div>  
+        <p>Beachfront</p>
+      </div>
+      <div class="filter" data-category="Mountains">
+        <div class="filter-icon"><i class="fa-solid fa-mountain"></i></div>  
+        <p>Mountains</p>
+      </div>
+      <div class="filter" data-category="Iconic Cities">
+        <div class="filter-icon"><i class="fa-solid fa-mountain-city"></i></div>  
+        <p>Iconic Cities</p>
+      </div>
+      <div class="filter" data-category="Castles">
+        <div class="filter-icon"><i class="fa-brands fa-fort-awesome"></i></div>  
+        <p>Castles</p>
+      </div>
+      <div class="filter" data-category="Luxury Villas">
+        <div class="filter-icon"><i class="fa-solid fa-gem"></i></div>  
+        <p>Luxury</p>
+      </div>
+      <div class="filter" data-category="Amazing Pools">
+        <div class="filter-icon"><i class="fa-solid fa-person-swimming"></i></div>  
+        <p>Amazing pools</p>
+      </div>
+      <div class="filter" data-category="Rooms">
+        <div class="filter-icon"><i class="fa-solid fa-bed"></i></div>  
+        <p>Rooms</p>
+      </div>
+      <div class="filter" data-category="Camping">
+        <div class="filter-icon"><i class="fa-solid fa-campground"></i></div>  
+        <p>Camping</p>
+      </div>
+      <div class="filter" data-category="Farms">
+        <div class="filter-icon"><i class="fa-solid fa-cow"></i></div>  
+        <p>Farms</p>
+      </div>
+      <div class="filter" data-category="Arctic">
+        <div class="filter-icon"><i class="fa-solid fa-snowflake"></i></div>  
+        <p>Arctic</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tax Switch Toggle -->
+  <div class="tax-toggle-box">
+    <div class="form-check form-switch tax-switch-wrap mb-0">
+      <input class="form-check-input tax-switch-input" type="checkbox" role="switch" id="taxSwitch">
+      <label class="form-check-label tax-switch-label" for="taxSwitch">
+        <span>Display total after taxes</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Active Filter Status & Reset Pill (Hidden by default, shown when filtering) -->
+<div id="filterStatusBox" class="filter-status-row d-none">
+  <span class="filter-status-text" id="filterStatusText">Showing all havens</span>
+  <button type="button" class="btn btn-sm btn-light border rounded-pill clear-filter-btn" id="clearFilterBtn">
+    <i class="fa-solid fa-xmark me-1"></i> Clear filter
+  </button>
+</div>
+
+<!-- Empty Search State -->
+<div id="noResultsState" class="empty-state-box text-center py-5 d-none">
+  <div class="empty-state-icon mb-3">
+    <i class="fa-solid fa-compass-drafting fa-3x text-muted opacity-50"></i>
+  </div>
+  <h4 class="fw-bold">No Havens Found</h4>
+  <p class="text-muted">We couldn't find any sanctuaries matching your criteria. Try adjusting your filters or search.</p>
+  <button class="btn btn-primary-gradient px-4 py-2 rounded-pill text-white" id="resetAllFiltersBtn">
+    Reset All Filters
+  </button>
+</div>
+
+<!-- Listings Cards Grid -->
+<div class="row row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-1 g-4 mt-1" id="listingsGrid">
+  <% for(let listing of allListings){ %>
+    <% 
+      const priceVal = listing.price || 0;
+      const taxIncludedPrice = Math.round(priceVal * 1.18);
+      // Auto-detect or use category
+      let categoryType = listing.category || "Trending";
+      const descLower = (listing.title + " " + listing.description + " " + listing.location).toLowerCase();
+      if(descLower.includes("beach") || descLower.includes("ocean") || descLower.includes("coastal")) categoryType = "Beachfront";
+      else if(descLower.includes("mountain") || descLower.includes("cabin") || descLower.includes("aspen") || descLower.includes("hills")) categoryType = "Mountains";
+      else if(descLower.includes("city") || descLower.includes("loft") || descLower.includes("downtown") || descLower.includes("new york") || descLower.includes("london") || descLower.includes("tokyo")) categoryType = "Iconic Cities";
+      else if(descLower.includes("castle") || descLower.includes("villa") || descLower.includes("historic") || descLower.includes("tuscany")) categoryType = "Castles";
+      else if(descLower.includes("pool") || descLower.includes("swim")) categoryType = "Amazing Pools";
+      else if(descLower.includes("camp") || descLower.includes("tent") || descLower.includes("forest")) categoryType = "Camping";
+      else if(descLower.includes("farm") || descLower.includes("barn")) categoryType = "Farms";
+      else if(descLower.includes("arctic") || descLower.includes("snow") || descLower.includes("lake")) categoryType = "Arctic";
+      else if(descLower.includes("luxury") || descLower.includes("resort")) categoryType = "Luxury Villas";
+    %>
+    <div 
+      class="col listing-col-item" 
+      data-title="<%= listing.title.toLowerCase() %>" 
+      data-location="<%= (listing.location + ' ' + listing.country).toLowerCase() %>"
+      data-category="<%= categoryType %>"
+    >
+      <div class="haven-card">
+        <!-- Image Container with Hover Zoom & Heart Button -->
+        <div class="haven-img-wrapper">
+          <a href="/listings/<%= listing._id %>" class="haven-img-link" aria-label="<%= listing.title %>">
+            <img 
+              src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80' %>" 
+              class="haven-card-img" 
+              alt="<%= listing.title %>"
+              loading="lazy"
+            >
+          </a>
+          
+          <!-- Guest Favorite Badge -->
+          <% if(priceVal > 2000 || categoryType === "Luxury Villas" || categoryType === "Castles") { %>
+            <div class="haven-badge-pill">
+              <i class="fa-solid fa-sparkles me-1 text-warning"></i> Guest Favorite
+            </div>
+          <% } %>
+
+          <!-- Wishlist Heart Button -->
+          <button class="wishlist-btn" data-listing-id="<%= listing._id %>" aria-label="Save to favorites" title="Save Haven">
+            <i class="fa-regular fa-heart heart-icon"></i>
+          </button>
+        </div>
+
+        <!-- Card Content -->
+        <a href="/listings/<%= listing._id %>" class="haven-content-link">
+          <div class="haven-card-body">
+            <div class="d-flex justify-content-between align-items-baseline mb-1">
+              <h5 class="haven-title mb-0" title="<%= listing.title %>"><%= listing.title %></h5>
+              <div class="haven-rating d-flex align-items-center gap-1">
+                <i class="fa-solid fa-star text-warning"></i>
+                <span class="rating-num">4.92</span>
+              </div>
+            </div>
+
+            <p class="haven-location text-muted mb-1">
+              <i class="fa-solid fa-location-dot me-1 text-danger opacity-75"></i> <%= listing.location %>, <%= listing.country %>
+            </p>
+            
+            <p class="haven-dates text-muted small mb-2">Available anytime &middot; Free cancellation</p>
+
+            <div class="haven-pricing">
+              <span class="haven-price fw-bold">
+                &#8377; <%= priceVal.toLocaleString("en-IN") %>
+              </span>
+              <span class="haven-per-night text-muted"> / night</span>
+
+              <!-- Dynamic Tax Included Badge -->
+              <span class="tax-badge d-none">
+                &middot; &#8377; <%= taxIncludedPrice.toLocaleString("en-IN") %> total with GST
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  <% } %>
+</div>

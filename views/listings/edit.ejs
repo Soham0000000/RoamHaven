@@ -1,0 +1,174 @@
+<%- layout("/layouts/boilerplate") -%>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden haven-form-card">
+        <!-- Card Header Banner -->
+        <div class="haven-form-header p-4 text-white">
+          <div class="d-flex align-items-center gap-3">
+            <div class="form-header-icon-box">
+              <i class="fa-solid fa-pen-ruler"></i>
+            </div>
+            <div>
+              <h3 class="fw-bold mb-1">Edit Your Haven</h3>
+              <p class="mb-0 opacity-75 small">Update photos, pricing, and details for <%= listing.title %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="card-body p-4 p-md-5">
+          <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+            <!-- Title -->
+            <div class="mb-4">
+              <label for="title" class="form-label fw-semibold text-dark">
+                Haven Title <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-heading text-muted"></i></span>
+                <input 
+                  name="listing[title]" 
+                  id="title"
+                  type="text" 
+                  value="<%= listing.title %>" 
+                  class="form-control border-start-0 ps-0" 
+                  required
+                >
+                <div class="invalid-feedback">Please enter a valid title.</div>
+              </div>
+            </div>
+
+            <!-- Category & Price in Row -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="category" class="form-label fw-semibold text-dark">
+                  Category
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-tags text-muted"></i></span>
+                  <select name="listing[category]" id="category" class="form-select border-start-0 ps-0">
+                    <% const categories = ["Trending", "Beachfront", "Mountains", "Iconic Cities", "Castles", "Luxury Villas", "Amazing Pools", "Rooms", "Camping", "Farms", "Arctic"]; %>
+                    <% for(let cat of categories){ %>
+                      <option value="<%= cat %>" <%= listing.category === cat ? 'selected' : '' %>><%= cat %></option>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="price" class="form-label fw-semibold text-dark">
+                  Price per Night (&#8377;) <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-indian-rupee-sign text-muted"></i></span>
+                  <input 
+                    name="listing[price]" 
+                    id="price"
+                    type="number" 
+                    value="<%= listing.price %>" 
+                    class="form-control border-start-0 ps-0" 
+                    required
+                  >
+                  <div class="invalid-feedback">Please enter a valid price.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label for="description" class="form-label fw-semibold text-dark">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea 
+                name="listing[description]" 
+                id="description"
+                rows="4" 
+                class="form-control" 
+                required
+              ><%= listing.description %></textarea>
+              <div class="invalid-feedback">Please enter a short description.</div>
+            </div>
+
+            <!-- Current Image & New Image Upload -->
+            <div class="row g-3 mb-4 align-items-center">
+              <div class="col-md-5">
+                <label class="form-label fw-semibold text-dark mb-1 d-block">Current Haven Image</label>
+                <div class="current-img-preview rounded-3 overflow-hidden border shadow-sm">
+                  <img src="<%= originalImageUrl || listing.image.url %>" alt="Current listing photo" class="img-fluid w-100 object-fit-cover" style="max-height: 160px;">
+                </div>
+              </div>
+              <div class="col-md-7">
+                <label for="image" class="form-label fw-semibold text-dark">
+                  Upload Replacement Image (Optional)
+                </label>
+                <input 
+                  name="image" 
+                  id="imageUploadInput" 
+                  type="file" 
+                  class="form-control mb-2" 
+                  accept="image/*"
+                >
+                <small class="text-muted d-block">Leave blank if you wish to keep the existing image.</small>
+                <!-- New Image Preview -->
+                <div id="imagePreviewBox" class="image-preview-container d-none mt-2 rounded-3 overflow-hidden border">
+                  <img id="imagePreviewTarget" src="" alt="New Preview" class="img-fluid w-100 object-fit-cover" style="max-height: 140px;">
+                  <div class="p-1 bg-light small text-muted text-center">New Image Preview</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Location & Country Row -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="location" class="form-label fw-semibold text-dark">
+                  Location / City <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-map-pin text-muted"></i></span>
+                  <input 
+                    name="listing[location]" 
+                    id="location"
+                    type="text" 
+                    value="<%= listing.location %>" 
+                    class="form-control border-start-0 ps-0" 
+                    required
+                  >
+                  <div class="invalid-feedback">Location should be valid.</div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="country" class="form-label fw-semibold text-dark">
+                  Country <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-globe text-muted"></i></span>
+                  <input 
+                    name="listing[country]" 
+                    id="country"
+                    type="text" 
+                    value="<%= listing.country %>" 
+                    class="form-control border-start-0 ps-0" 
+                    required
+                  >
+                  <div class="invalid-feedback">Country should be valid.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button & Cancel Link -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+              <a href="/listings/<%= listing._id %>" class="btn btn-light rounded-pill px-4 text-muted">
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-primary-gradient px-5 py-2 rounded-pill text-white fw-bold shadow-sm">
+                <i class="fa-solid fa-check me-2"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

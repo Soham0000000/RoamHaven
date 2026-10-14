@@ -1,0 +1,26 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 text-center py-5">
+      <div class="mb-4">
+        <div class="brand-icon-wrapper-lg mx-auto mb-3">
+          <i class="fa-solid fa-compass-drafting text-danger fa-3x animate-pulse"></i>
+        </div>
+        <h2 class="fw-bold text-dark mb-2">Haven Not Found</h2>
+        <p class="text-secondary lead fs-6">
+          <%= err.message || "We couldn't locate the sanctuary you are seeking." %>
+        </p>
+      </div>
+
+      <div class="d-flex justify-content-center gap-3">
+        <a href="/listings" class="btn btn-primary-gradient px-4 py-2 rounded-pill text-white fw-semibold">
+          <i class="fa-solid fa-compass me-2"></i> Explore All Havens
+        </a>
+        <button onclick="history.back()" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+          Go Back
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
